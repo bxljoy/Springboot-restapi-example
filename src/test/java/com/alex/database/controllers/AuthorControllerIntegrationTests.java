@@ -7,11 +7,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.alex.database.TestDataUtil;
 import com.alex.database.domain.dto.AuthorDto;
+import com.alex.database.domain.entities.AuthorEntity;
+import com.alex.database.services.AuthorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
@@ -21,12 +24,15 @@ public class AuthorControllerIntegrationTests {
     
     private final MockMvc mockMvc;
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+
+    private final AuthorService authorService;
 
     @Autowired
-    public AuthorControllerIntegrationTests(MockMvc mockMvc) {
+    public AuthorControllerIntegrationTests(MockMvc mockMvc, AuthorService authorService) {
         this.mockMvc = mockMvc;
         this.objectMapper = new ObjectMapper();
+        this.authorService = authorService;
     }
 
     @Test
@@ -61,5 +67,36 @@ public class AuthorControllerIntegrationTests {
         ).andExpect(
             MockMvcResultMatchers.jsonPath("$.age").value("40")
         );
+    }
+
+    @Test
+    public void testThatListAuthorsReturnsHttpStatus200() throws Exception {
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/authors")
+                    .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+            MockMvcResultMatchers.status().isOk()
+        );
+    }
+
+    @Test
+    public void testThatListAuthorsReturnsListOfAuthors() throws Exception {
+        AuthorEntity authorA = TestDataUtil.createTestAuthor(1L, "Alex", 40);
+        AuthorEntity authorB = TestDataUtil.createTestAuthor(2L, "Jess", 40);
+        AuthorEntity authorC = TestDataUtil.createTestAuthor(3L, "Dora", 8);
+        authorService.createAuthor(authorA);
+        authorService.createAuthor(authorB);
+        authorService.createAuthor(authorC);
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/authors")
+                    .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$[0].id").isNumber()
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$[0].name").value("Alex")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$[0].age").value(40)
+        )
+        ;
     }
 }
