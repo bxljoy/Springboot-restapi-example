@@ -1,6 +1,7 @@
 package com.alex.database.controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -44,5 +46,14 @@ public class BookController {
        List<BookEntity> books = bookService.findAll();
        return books.stream().map(bookMapper::mapTo).collect(Collectors.toList());
     }
-    
+
+    @GetMapping("/books/{isbn}")
+    public ResponseEntity<BookDto> getBook(@PathVariable("isbn") String isbn) {
+        Optional<BookEntity> foundBook = bookService.findOne(isbn);
+        return foundBook.map(bookEntity -> {
+            BookDto bookDto = bookMapper.mapTo(bookEntity);
+            return new ResponseEntity<>(bookDto, HttpStatus.OK);
+        }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+        
 }

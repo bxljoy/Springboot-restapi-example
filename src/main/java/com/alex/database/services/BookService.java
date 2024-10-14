@@ -1,6 +1,7 @@
 package com.alex.database.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -12,4 +13,6 @@ public interface BookService {
     BookEntity createBook(String isbn, BookEntity bookEntity);
     
     List<BookEntity> findAll();
+
+    Optional<BookEntity> findOne(String isbn);
 }

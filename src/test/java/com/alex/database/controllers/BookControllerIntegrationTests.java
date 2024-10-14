@@ -99,4 +99,45 @@ public class BookControllerIntegrationTests {
         )
         ;
     }
+
+    @Test
+    public void testThatGetBookReturnsHttpStatus200() throws Exception {
+        AuthorEntity author = TestDataUtil.createTestAuthor(1L, "Alex", 40);
+        BookEntity book = TestDataUtil.createTestBook("123456789", "Kotlin", author);
+        bookService.createBook(book.getIsbn(),book);
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/books/" + book.getIsbn())
+                    .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+            MockMvcResultMatchers.status().isOk()
+        );
+    }
+
+    @Test
+    public void testThatGetBookReturnsHttpStatus404WhenNoBookExists() throws Exception {
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/books/999")
+                    .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+            MockMvcResultMatchers.status().isNotFound()
+        );
+    }
+
+    @Test
+    public void testThatGetBookReturnsBookWhenBookExists() throws Exception {
+        AuthorEntity author = TestDataUtil.createTestAuthor(1L, "Alex", 40);
+        BookEntity book = TestDataUtil.createTestBook("123456789", "Kotlin", author);
+        bookService.createBook(book.getIsbn(),book);
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/books/" + book.getIsbn())
+                    .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.isbn").value("123456789")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.title").value("Kotlin")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$.author.age").value(40)
+        )
+        ;
+    }
 }
