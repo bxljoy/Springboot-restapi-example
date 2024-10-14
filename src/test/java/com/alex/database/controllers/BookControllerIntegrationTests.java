@@ -15,6 +15,7 @@ import com.alex.database.domain.dto.AuthorDto;
 import com.alex.database.domain.dto.BookDto;
 import com.alex.database.domain.entities.AuthorEntity;
 import com.alex.database.domain.entities.BookEntity;
+import com.alex.database.services.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
@@ -24,11 +25,13 @@ public class BookControllerIntegrationTests {
     
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
+    private final BookService bookService;
 
     @Autowired
-    public BookControllerIntegrationTests(MockMvc mockMvc) {
+    public BookControllerIntegrationTests(MockMvc mockMvc, BookService bookService) {
         this.mockMvc = mockMvc;
         this.objectMapper = new ObjectMapper();
+        this.bookService = bookService;
     }
 
     @Test
@@ -59,14 +62,41 @@ public class BookControllerIntegrationTests {
             MockMvcResultMatchers.jsonPath("$.isbn").value("1234567890")
         ).andExpect(
             MockMvcResultMatchers.jsonPath("$.title").value("Java")
+        );
+    }
+
+
+    @Test
+    public void testThatListBooksReturnsHttpStatus200() throws Exception {
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/books")
+                    .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+            MockMvcResultMatchers.status().isOk()
+        );
+    }
+
+    @Test
+    public void testThatListBooksReturnsListOfBooks() throws Exception {
+        AuthorEntity author = TestDataUtil.createTestAuthor(3L, "Dora", 7);
+        author.setId(null);
+        BookEntity bookA = TestDataUtil.createTestBook("1234567890", "Java", author);
+        bookService.createBook(bookA.getIsbn(), bookA);
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/books")
+                    .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$[0].isbn").value("1234567890")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$[0].title").value("Java")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$[0].author.name").value("Dora")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$[0].author.age").value("7")
+        ).andExpect(
+            MockMvcResultMatchers.jsonPath("$[0].author.id").isNumber()
         )
-        // .andExpect(
-        //     MockMvcResultMatchers.jsonPath("$.author.name").value("Dora")
-        // ).andExpect(
-        //     MockMvcResultMatchers.jsonPath("$.author.age").value(7)
-        // ).andExpect(
-        //     MockMvcResultMatchers.jsonPath("$.author.id").isNumber()
-        // )
         ;
     }
 }
