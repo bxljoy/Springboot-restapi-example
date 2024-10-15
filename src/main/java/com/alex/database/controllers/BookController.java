@@ -18,30 +18,35 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
 @RestController
 public class BookController {
 
     private final Mapper<BookEntity, BookDto> bookMapper;
     private final BookService bookService;
 
-
     public BookController(BookService bookService, Mapper<BookEntity, BookDto> bookMapper) {
         this.bookService = bookService;
         this.bookMapper = bookMapper;
     }
-    
+
     @PutMapping("/books/{isbn}")
-    public ResponseEntity<BookDto> createBook(@PathVariable("isbn") String isbn, @RequestBody BookDto bookDto) {
+    public ResponseEntity<BookDto> createUpdateBook(@PathVariable("isbn") String isbn, @RequestBody BookDto bookDto) {
         BookEntity bookEntity = bookMapper.mapFrom(bookDto);
-        BookEntity savedBookEntity = bookService.createBook(isbn, bookEntity);
-        return new ResponseEntity<>(bookMapper.mapTo(savedBookEntity), HttpStatus.CREATED);
+        boolean bookExists = bookService.isExists(isbn);
+        BookEntity savedBookEntity = bookService.createUpdateBook(isbn, bookEntity);
+        BookDto savedUpdatedBookDto = bookMapper.mapTo(savedBookEntity);
+
+        if (bookExists) {
+            return new ResponseEntity<>(savedUpdatedBookDto, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(savedUpdatedBookDto, HttpStatus.CREATED);
+        }
     }
 
     @GetMapping("/books")
     public List<BookDto> listBooks() {
-       List<BookEntity> books = bookService.findAll();
-       return books.stream().map(bookMapper::mapTo).collect(Collectors.toList());
+        List<BookEntity> books = bookService.findAll();
+        return books.stream().map(bookMapper::mapTo).collect(Collectors.toList());
     }
 
     @GetMapping("/books/{isbn}")
@@ -52,5 +57,5 @@ public class BookController {
             return new ResponseEntity<>(bookDto, HttpStatus.OK);
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-        
+
 }
