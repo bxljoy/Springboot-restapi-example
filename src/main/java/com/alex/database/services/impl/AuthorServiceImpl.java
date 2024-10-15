@@ -27,7 +27,8 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public List<AuthorEntity> findAll() {
-        // return StreamSupport.stream(authorRepository.findAll().spliterator(), false).toList();
+        // return StreamSupport.stream(authorRepository.findAll().spliterator(),
+        // false).toList();
         return StreamSupport.stream(authorRepository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
@@ -40,6 +41,15 @@ public class AuthorServiceImpl implements AuthorService {
     public boolean isExists(Long id) {
         return authorRepository.existsById(id);
     }
-    
-    
+
+    @Override
+    public AuthorEntity partialUpdate(Long id, AuthorEntity authorEntity) {
+        authorEntity.setId(id);
+        return authorRepository.findById(id).map(existtingAuthor -> {
+            Optional.ofNullable(authorEntity.getName()).ifPresent(existtingAuthor::setName);
+            Optional.ofNullable(authorEntity.getAge()).ifPresent(existtingAuthor::setAge);
+            return authorRepository.save(existtingAuthor);
+        }).orElseThrow(() -> new RuntimeException("Author does not exist"));
+    }
+
 }

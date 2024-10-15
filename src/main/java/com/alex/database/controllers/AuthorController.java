@@ -16,9 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-
 
 @RestController
 public class AuthorController {
@@ -38,7 +38,7 @@ public class AuthorController {
         AuthorEntity savedAuthorEntity = authorService.save(authorEntity);
         return new ResponseEntity<>(authorMapper.mapTo(savedAuthorEntity), HttpStatus.CREATED);
     }
-    
+
     @GetMapping("/authors")
     public List<AuthorDto> listAuthors() {
         List<AuthorEntity> authors = authorService.findAll();
@@ -54,17 +54,32 @@ public class AuthorController {
             return new ResponseEntity<>(authorDto, HttpStatus.OK);
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-    
-    @PutMapping("authors/{id}")
+
+    @PutMapping("/authors/{id}")
     public ResponseEntity<AuthorDto> fullUpdateAuthor(@PathVariable("id") Long id, @RequestBody AuthorDto authorDto) {
         if (!authorService.isExists(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } 
+        }
 
         authorDto.setId(id);
         AuthorEntity authorEntity = authorMapper.mapFrom(authorDto);
         AuthorEntity savedAuthor = authorService.save(authorEntity);
         AuthorDto savedAuthorDto = authorMapper.mapTo(savedAuthor);
         return new ResponseEntity<>(savedAuthorDto, HttpStatus.OK);
+    }
+
+    @PatchMapping("/authors/{id}")
+    public ResponseEntity<AuthorDto> partialUpdate(
+            @PathVariable("id") Long id,
+            @RequestBody AuthorDto authorDto) {
+
+        if (!authorService.isExists(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        AuthorEntity authorEntity = authorMapper.mapFrom(authorDto);
+        AuthorEntity updatedAuthor = authorService.partialUpdate(id, authorEntity);
+        AuthorDto updatedAuthorDto = authorMapper.mapTo(updatedAuthor);
+        return new ResponseEntity<>(updatedAuthorDto, HttpStatus.OK);
     }
 }
