@@ -206,4 +206,25 @@ public class BookControllerIntegrationTests {
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.author.age").value(40));
     }
+
+    @Test
+    public void testThatDeleteBookReturnsHttp204WhenNoExist() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/books/999")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(
+                        MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    public void testThatDeleteBookReturnsHttp204WhenExist() throws Exception {
+        BookEntity bookEntity = TestDataUtil.createTestBook("123123123", "Terraform", null);
+        BookEntity savedBook = bookService.createUpdateBook("123123123", bookEntity);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/books/" + savedBook.getIsbn())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(
+                        MockMvcResultMatchers.status().isNoContent());
+    }
 }
