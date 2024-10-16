@@ -102,6 +102,44 @@ public class BookControllerIntegrationTests {
     }
 
     @Test
+    public void testThatPartialUpdateBookSuccessfullyReturnsHttp200Updated() throws Exception {
+        AuthorEntity authorEntity = TestDataUtil.createTestAuthor(1L, "Alex", 39);
+        BookEntity bookEntity = TestDataUtil.createTestBook("123456", "Java", authorEntity);
+        BookEntity savedBook = bookService.createUpdateBook(bookEntity.getIsbn(), bookEntity);
+
+        AuthorDto authorDto = TestDataUtil.createTestAuthorDto(2L, "Dora", 7);
+        BookDto bookDto = TestDataUtil.createTestBookDto("123456", "Rust", authorDto);
+
+        String bookJson = objectMapper.writeValueAsString(bookDto);
+        mockMvc.perform(
+                MockMvcRequestBuilders.patch("/books/" + savedBook.getIsbn())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookJson))
+                .andExpect(
+                        MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void testThatPartialUpdateBookSuccessfullyReturnsSavedBook() throws Exception {
+        AuthorEntity authorEntity = TestDataUtil.createTestAuthor(1L, "Alex", 39);
+        BookEntity bookEntity = TestDataUtil.createTestBook("123456", "Java", authorEntity);
+        BookEntity savedBook = bookService.createUpdateBook(bookEntity.getIsbn(), bookEntity);
+
+        AuthorDto authorDto = TestDataUtil.createTestAuthorDto(2L, "Dora", 7);
+        BookDto bookDto = TestDataUtil.createTestBookDto("123456", "Rust", authorDto);
+
+        String bookJson = objectMapper.writeValueAsString(bookDto);
+        mockMvc.perform(
+                MockMvcRequestBuilders.patch("/books/" + savedBook.getIsbn())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookJson))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.isbn").value(bookDto.getIsbn()))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.title").value(bookDto.getTitle()));
+    }
+
+    @Test
     public void testThatListBooksReturnsHttpStatus200() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/books")

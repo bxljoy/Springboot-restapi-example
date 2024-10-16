@@ -17,6 +17,7 @@ import com.alex.database.services.BookService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 @RestController
 public class BookController {
@@ -41,6 +42,20 @@ public class BookController {
         } else {
             return new ResponseEntity<>(savedUpdatedBookDto, HttpStatus.CREATED);
         }
+    }
+
+    @PatchMapping("/books/{isbn}")
+    public ResponseEntity<BookDto> partialUpdateBook(
+            @PathVariable("isbn") String isbn,
+            @RequestBody BookDto bookDto) {
+        if (!bookService.isExists(isbn)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        BookEntity bookEntity = bookMapper.mapFrom(bookDto);
+        BookEntity updatedBook = bookService.partialUpdate(isbn, bookEntity);
+        BookDto updatedBookDto = bookMapper.mapTo(updatedBook);
+        return new ResponseEntity<>(updatedBookDto, HttpStatus.OK);
     }
 
     @GetMapping("/books")
