@@ -220,4 +220,24 @@ public class AuthorControllerIntegrationTests {
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.age").value(authorDto.getAge()));
     }
+
+    @Test
+    public void testThatDeleteAuthorReturnsHttp204WhenNoExist() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/authors/9999")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(
+                        MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    public void testThatDeleteAuthorReturnsHttp204WhenExist() throws Exception {
+        AuthorEntity author = TestDataUtil.createTestAuthor(1L, "Alex", 40);
+        AuthorEntity savedAuthor = authorService.save(author);
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/authors/" + savedAuthor.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(
+                        MockMvcResultMatchers.status().isNoContent());
+    }
 }

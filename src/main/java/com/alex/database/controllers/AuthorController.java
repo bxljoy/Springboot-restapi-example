@@ -1,20 +1,18 @@
 package com.alex.database.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
-
 import com.alex.database.domain.dto.AuthorDto;
 import com.alex.database.domain.entities.AuthorEntity;
 import com.alex.database.mappers.Mapper;
 import com.alex.database.services.AuthorService;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -81,5 +79,11 @@ public class AuthorController {
         AuthorEntity updatedAuthor = authorService.partialUpdate(id, authorEntity);
         AuthorDto updatedAuthorDto = authorMapper.mapTo(updatedAuthor);
         return new ResponseEntity<>(updatedAuthorDto, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/authors/{id}")
+    public ResponseEntity<Void> deleteAuthor(@PathVariable("id") Long id) {
+        authorService.delete(id);
+        return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
 }
