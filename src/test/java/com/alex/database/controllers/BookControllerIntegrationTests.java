@@ -149,25 +149,24 @@ public class BookControllerIntegrationTests {
     }
 
     @Test
-    public void testThatListBooksReturnsListOfBooks() throws Exception {
-        AuthorEntity author = TestDataUtil.createTestAuthor(3L, "Dora", 7);
-        author.setId(null);
-        BookEntity bookA = TestDataUtil.createTestBook("1234567890", "Java", author);
-        bookService.createUpdateBook(bookA.getIsbn(), bookA);
+    public void testThatListBooksReturnsPageOfBooks() throws Exception {
+        AuthorEntity author = TestDataUtil.createTestAuthor(null, "Dora", 7);
+        for (int i = 0; i < 40; i++) {
+            BookEntity bookEntity = TestDataUtil.createTestBook(String.valueOf(i), "Java" + i, author);
+            bookService.createUpdateBook(bookEntity.getIsbn(), bookEntity);
+        }
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/books")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$[0].isbn").value("1234567890"))
+                        MockMvcResultMatchers.jsonPath("$.content[0].isbn").value("0"))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$[0].title").value("Java"))
+                        MockMvcResultMatchers.jsonPath("$.content[0].title").value("Java0"))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$[0].author.name").value("Dora"))
+                        MockMvcResultMatchers.jsonPath("$.totalPages").value("2"))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$[0].author.age").value("7"))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath("$[0].author.id").isNumber());
+                        MockMvcResultMatchers.jsonPath("$.size").value("20"));
     }
 
     @Test
