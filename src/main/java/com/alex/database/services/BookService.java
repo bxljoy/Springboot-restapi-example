@@ -25,4 +25,6 @@ public interface BookService {
     void delete(String isbn);
 
     Page<BookEntity> findAll(Pageable pageable);
+
+    int getNumberOfBooksByAuthorId(Long authorId);
 }

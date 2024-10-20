@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class BookRepositoryIntegrationTests {
-    
+
     private BookRepository underTest;
 
     @Autowired
@@ -43,8 +43,8 @@ public class BookRepositoryIntegrationTests {
         BookEntity bookB = TestDataUtil.createTestBook("0987654321", "Spring", author);
         underTest.save(bookB);
         assertThat(underTest.findAll()).hasSize(2)
-        .contains(bookA, bookB)
-        .doesNotContain(TestDataUtil.createTestBook("47293749234", "Rust", author));
+                .contains(bookA, bookB)
+                .doesNotContain(TestDataUtil.createTestBook("47293749234", "Rust", author));
     }
 
     @Test
@@ -74,5 +74,20 @@ public class BookRepositoryIntegrationTests {
         underTest.deleteById(book.getIsbn());
         Optional<BookEntity> resultB = underTest.findById(book.getIsbn());
         assertThat(resultB).isEmpty();
+    }
+
+    @Test
+    public void testThatCanGetNumberOfBooksByAuthorId() {
+        AuthorEntity author = TestDataUtil.createTestAuthor(1L, "Jess", 40);
+
+        BookEntity book1 = TestDataUtil.createTestBook("1", "Java", author);
+        underTest.save(book1);
+        BookEntity book2 = TestDataUtil.createTestBook("2", "Rust", author);
+        underTest.save(book2);
+        BookEntity book3 = TestDataUtil.createTestBook("3", "Go", author);
+        underTest.save(book3);
+
+        int numberOfBooks = underTest.countByAuthorEntity_Id(author.getId());
+        assertThat(numberOfBooks).isEqualTo(3);
     }
 }

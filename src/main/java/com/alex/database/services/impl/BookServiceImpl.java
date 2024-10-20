@@ -63,4 +63,8 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAll(pageable);
     }
 
+    @Override
+    public int getNumberOfBooksByAuthorId(Long authorId) {
+        return bookRepository.getNumberOfBooksByAuthorId(authorId);
+    }
 }
