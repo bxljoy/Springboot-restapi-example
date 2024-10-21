@@ -16,13 +16,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class AuthorRepositoryIntegrationTests {
 
-    private AuthorRepository underTest;
+    private final AuthorRepository underTest;
 
     @Autowired
     public AuthorRepositoryIntegrationTests(AuthorRepository underTest) {
         this.underTest = underTest;
     }
-    
+
     @Test
     public void testThatAuthorCanBeCreatedAndRecalled() {
         AuthorEntity author = TestDataUtil.createTestAuthor(1L, "Alex", 40);
@@ -40,7 +40,7 @@ public class AuthorRepositoryIntegrationTests {
         underTest.save(authorB);
         Iterable<AuthorEntity> result = underTest.findAll();
         assertThat(result).hasSize(2)
-        .contains(authorA, authorB);
+                .contains(authorA, authorB);
     }
 
     @Test

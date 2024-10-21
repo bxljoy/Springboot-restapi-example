@@ -28,11 +28,12 @@ public class BookServiceImpl implements BookService {
         return bookRepository.save(bookEntity);
     }
 
-    @Override
-    public List<BookEntity> findAll() {
-        Iterable<BookEntity> books = bookRepository.findAll();
-        return StreamSupport.stream(books.spliterator(), false).collect(Collectors.toList());
-    }
+    // @Override
+    // public List<BookEntity> findAll() {
+    // Iterable<BookEntity> books = bookRepository.findAll();
+    // return StreamSupport.stream(books.spliterator(),
+    // false).collect(Collectors.toList());
+    // }
 
     @Override
     public Optional<BookEntity> findOne(String isbn) {

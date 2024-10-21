@@ -121,6 +121,20 @@ public class BookControllerIntegrationTests {
         }
 
         @Test
+        public void testThatPartialUpdateBookFailedReturnsHttpNotFound() throws Exception {
+                AuthorDto authorDto = TestDataUtil.createTestAuthorDto(2L, "Dora", 7);
+                BookDto bookDto = TestDataUtil.createTestBookDto("123456", "Rust", authorDto);
+
+                String bookJson = objectMapper.writeValueAsString(bookDto);
+                mockMvc.perform(
+                                MockMvcRequestBuilders.patch("/books/" + bookDto.getIsbn())
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(bookJson))
+                                .andExpect(
+                                                MockMvcResultMatchers.status().isNotFound());
+        }
+
+        @Test
         public void testThatPartialUpdateBookSuccessfullyReturnsSavedBook() throws Exception {
                 AuthorEntity authorEntity = TestDataUtil.createTestAuthor(1L, "Alex", 39);
                 BookEntity bookEntity = TestDataUtil.createTestBook("123456", "Java", authorEntity);
