@@ -7,14 +7,17 @@ import org.springframework.stereotype.Component;
 import com.alex.database.domain.dto.AuthorDto;
 import com.alex.database.domain.entities.AuthorEntity;
 import com.alex.database.mappers.Mapper;
+import com.alex.database.services.BookService;
 
 @Component
 public class AuthorMapperImpl implements Mapper<AuthorEntity, AuthorDto> {
 
     private final ModelMapper modelMapper;
+    private final BookService bookService;
 
-    public AuthorMapperImpl(ModelMapper modelMapper) {
+    public AuthorMapperImpl(ModelMapper modelMapper, BookService bookService) {
         this.modelMapper = modelMapper;
+        this.bookService = bookService;
         configMapper();
     }
 
@@ -23,7 +26,8 @@ public class AuthorMapperImpl implements Mapper<AuthorEntity, AuthorDto> {
 
             @Override
             protected void configure() {
-                map().setNumberOfBooks(100);
+                using(ctx -> bookService.getNumberOfBooksByAuthorId(((AuthorEntity) ctx.getSource()).getId()))
+                        .map(source, destination.getNumberOfBooks());
             }
         });
     }

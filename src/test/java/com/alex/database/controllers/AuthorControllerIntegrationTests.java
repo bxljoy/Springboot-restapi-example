@@ -65,7 +65,7 @@ public class AuthorControllerIntegrationTests {
                                 .andExpect(
                                                 MockMvcResultMatchers.jsonPath("$.age").value("40"))
                                 .andExpect(
-                                                MockMvcResultMatchers.jsonPath("$.numberOfBooks").value("100"));
+                                                MockMvcResultMatchers.jsonPath("$.numberOfBooks").value(0));
         }
 
         @Test
