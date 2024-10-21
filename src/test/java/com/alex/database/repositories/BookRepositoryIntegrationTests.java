@@ -87,6 +87,21 @@ public class BookRepositoryIntegrationTests {
         BookEntity book3 = TestDataUtil.createTestBook("3", "Go", author);
         underTest.save(book3);
 
+        int numberOfBooks = underTest.getNumberOfBooksByAuthorId(author.getId());
+        assertThat(numberOfBooks).isEqualTo(3);
+    }
+
+    @Test
+    public void testThatCountByAuthorId() {
+        AuthorEntity author = TestDataUtil.createTestAuthor(1L, "Jess", 40);
+
+        BookEntity book1 = TestDataUtil.createTestBook("1", "Java", author);
+        underTest.save(book1);
+        BookEntity book2 = TestDataUtil.createTestBook("2", "Rust", author);
+        underTest.save(book2);
+        BookEntity book3 = TestDataUtil.createTestBook("3", "Go", author);
+        underTest.save(book3);
+
         int numberOfBooks = underTest.countByAuthorEntity_Id(author.getId());
         assertThat(numberOfBooks).isEqualTo(3);
     }
