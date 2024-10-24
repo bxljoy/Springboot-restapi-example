@@ -1,38 +1,39 @@
 package com.alex.database.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 
 import com.alex.database.TestDataUtil;
 import com.alex.database.domain.entities.AuthorEntity;
+import com.alex.database.repositories.AuthorRepository;
+import com.alex.database.services.impl.AuthorServiceImpl;
 
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class AuthorServiceIntegrationTests {
+public class AuthorServiceUnitTests {
 
-    private final AuthorService authorService;
+    @Mock
+    private AuthorRepository authorRepository;
 
-    @Autowired
-    public AuthorServiceIntegrationTests(AuthorService authorService) {
-        this.authorService = authorService;
-    }
+    @InjectMocks
+    private AuthorServiceImpl authorService;
 
     @Test
     public void testThatFindAll() {
+
         AuthorEntity authorA = TestDataUtil.createTestAuthor(1L, "Alex", 40);
-        authorService.save(authorA);
-
         AuthorEntity authorB = TestDataUtil.createTestAuthor(2L, "Jess", 40);
-        authorService.save(authorB);
-
         AuthorEntity authorC = TestDataUtil.createTestAuthor(3L, "Dora", 8);
-        authorService.save(authorC);
+        List<AuthorEntity> authors = new ArrayList<>(Arrays.asList(authorA, authorB, authorC));
+        when(authorService.findAll()).thenReturn(authors);
 
         List<AuthorEntity> result = authorService.findAll();
 
