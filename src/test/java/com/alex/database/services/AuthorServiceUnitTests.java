@@ -1,6 +1,8 @@
 package com.alex.database.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -39,6 +41,8 @@ public class AuthorServiceUnitTests {
 
         assertThat(result).hasSize(3).contains(authorA, authorB, authorC)
                 .doesNotContain(TestDataUtil.createTestAuthor(4L, "Haha", 1));
+
+        verify(authorRepository, times(1)).findAll();
     }
 
 }
