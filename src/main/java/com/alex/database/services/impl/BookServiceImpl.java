@@ -4,6 +4,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alex.database.domain.entities.BookEntity;
 import com.alex.database.repositories.BookRepository;
@@ -41,6 +42,7 @@ public class BookServiceImpl implements BookService {
         return bookRepository.existsById(isbn);
     }
 
+    @Transactional
     @Override
     public BookEntity partialUpdate(String isbn, BookEntity bookEntity) {
         return bookRepository.findById(isbn).map(existingBook -> {

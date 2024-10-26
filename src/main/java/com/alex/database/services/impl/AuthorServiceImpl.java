@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alex.database.domain.entities.AuthorEntity;
 import com.alex.database.repositories.AuthorRepository;
@@ -42,6 +43,7 @@ public class AuthorServiceImpl implements AuthorService {
         return authorRepository.existsById(id);
     }
 
+    @Transactional
     @Override
     public AuthorEntity partialUpdate(Long id, AuthorEntity authorEntity) {
         return authorRepository.findById(id).map(existtingAuthor -> {
